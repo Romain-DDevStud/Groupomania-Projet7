@@ -3,7 +3,10 @@ const path = require('path');
 
 const userRoutes = require('./routes/user');
 const messageRoutes = require('./routes/messages');
+const commentRoutes = require('./routes');
+const likeRoutes = require('./routes');
 
+// lancement de Express
 const app = express();
 
 // middleware pour gestion erreur de CORS
@@ -16,6 +19,5 @@ app.use((req, res, next) => {
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-app.use('/api/auth', userRoutes);
 
 module.exports = app;
