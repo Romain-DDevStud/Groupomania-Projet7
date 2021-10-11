@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 
 const userRoutes = require('./routes/user');
-const messageRoutes = require('./routes/messages');
+const messageRoutes = require('./routes/post');
 const commentRoutes = require('./routes');
 const likeRoutes = require('./routes');
 
