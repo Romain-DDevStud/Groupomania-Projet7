@@ -149,6 +149,20 @@ exports.getCurrentUser = (req, res, next) => {
 }
 
 /* Récupération de tous les utilisateurs */
+exports.getAllUsers = (req, res, next) => {
+    const connection = database.connect();
+    const sql = "SELECT id, name, pictureurl FROM Users;";
+    connection.query(sql, (error, users, fields) => {
+        if (error) {
+            res.status(500).json({ "error": error.sqlMessage });
+        } else {
+            res.status(200).json({ users });
+        }
+    });
+    connection.end();
+}
+
+/* Récupération d'un utilisateur */
 exports.getOneUser = (req, res, next) => {
     const connection = database.connect();
     const searchId = req.params.id;

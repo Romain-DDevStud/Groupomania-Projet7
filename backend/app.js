@@ -1,10 +1,15 @@
 const express = require('express');
+require('dotenv').config();
 const path = require('path');
+const fs = require('fs');
+
+const Cookies = require('cookies');
+const cryptojs = require('crypto-js');
 
 const userRoutes = require('./routes/user');
-const messageRoutes = require('./routes/post');
-const commentRoutes = require('./routes');
-const likeRoutes = require('./routes');
+const postRoutes = require('./routes/post');
+const commentRoutes = require('./routes/comment');
+const likeRoutes = require('./routes/like');
 
 // lancement de Express
 const app = express();
@@ -18,6 +23,9 @@ app.use((req, res, next) => {
 });
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
-
+app.use('/api/user', userRoutes);
+app.use('/api/post', postRoutes);
+app.use('/api/comment', commentRoutes);
+app.use('/api/like', likeRoutes);
 
 module.exports = app;
