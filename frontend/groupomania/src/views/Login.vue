@@ -17,7 +17,7 @@
           <input type="text" class="form-control" id="inputEmail" v-model="dataLogin.email"/>
         </div>
         <div class="form-group">
-          <label for="inputPassword">Password </label>
+          <label for="inputPassword">Mot de passe </label>
           <input type="password" class="form-control" id="inputPassword" v-model="dataLogin.password"/>
         </div>
         <button @click.prevent="logIn" type="submit" class="btn-connexion">Se connecter</button>
@@ -68,17 +68,16 @@ export default {
 </script>
 
 <style>
-img {
-  width: 250px;
-}
 main {
-    margin: 50px 0;
     width: 100%;
     background-color: white;
     margin: 0 auto;
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 18px;
+}
+form {
+    margin: 50px 0;
 }
 .container2 {
     margin: 30px 0 20px 0;

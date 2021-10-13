@@ -1,7 +1,7 @@
 <template>
      <footer>
     <div class="wrapper">
-      <small>&copy;2021 <strong>Groupomania</strong>, Tous droits réservés</small>
+      <small>&copy; 2021 <strong>Groupomania</strong>, Tous droits réservés</small>
       <nav class="footer-nav">
         <a href="#hautdepage">Haut de la page</a>
       </nav>
@@ -20,7 +20,7 @@ footer {
     background: #ffd7d7;
     display: table;
     width: 100%;
-    height: 8rem;
+    height: 9rem;
     text-align: center;
     font-family: 'Arial', sans-serif;
     font-size: 1rem;
