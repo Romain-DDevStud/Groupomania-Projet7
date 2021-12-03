@@ -13,16 +13,15 @@ exports.newComment = (req, res, next) => {
     const sql = "INSERT INTO Comments (user_id, post_id, content)\
                 VALUES (?, ?, ?);";
     const sqlParams = [userId, postId, content];
+    console.log('sqlparam',sqlParams) ;
     connection.execute(sql, sqlParams, (error, results, fields) => {
         if (error) {
             res.status(500).json({ "error": error.sqlMessage });
         } else {
-            then(data => {
+                
             res.status(201).json({ message: 'Commentaire ajouté' });
-            })
-            .catch(err => {
-            res.status(500).json({ "error": err });
-            })
+    
+          
         }
     });
     connection.end();
@@ -32,7 +31,7 @@ exports.newComment = (req, res, next) => {
 exports.getCommentsofPost = (req, res, next) => {
     const connection = database.connect();
     const postId = req.body.postId;
-    const sql = "SELECT Comments.id AS commentId, Comments.publication_date AS commentDate, Comments.content As commentContent, Users.id AS userId, Users.name AS userName, Users.pictureurl AS userPicture\
+    const sql = "SELECT Comments.id AS commentId,Comments.post_id AS postId, Comments.publication_date AS commentDate, Comments.content As commentContent, Users.id AS userId, Users.name AS userName, Users.pictureurl AS userPicture\
                 FROM Comments\
                 INNER JOIN Users ON Comments.user_id = Users.id\
                 WHERE Comments.post_id = ?";

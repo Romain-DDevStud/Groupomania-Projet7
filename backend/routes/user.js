@@ -7,7 +7,7 @@ const valid = require('../middleware/valid-input');
 const status = require('../middleware/check-status');
 const multer = require('../middleware/multer-config');
 
-router.post('/new', valid.newUSer, userCtrl.newUser);
+router.post('/signup', valid.newUSer, userCtrl.newUser);
 router.post('/login', valid.login, userCtrl.login);
 router.get('/logout', userCtrl.logout);
 router.get('/isauth', auth, userCtrl.isAuth);

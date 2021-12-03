@@ -46,22 +46,22 @@ export default {
   },
   methods: {
     logIn() {
-  
-    if (
+      if (
         this.dataLogin.email ==null ||
         this.dataLogin.password ==null 
-      )
-      { this.msg ="ERREUR DE SAISIE"}
-      {
-        axios
+        ){ 
+          this.msg ="ERREUR DE SAISIE"
+        }
+        {
+          axios
           .post("http://localhost:3000/api/auth/login", this.dataLogin)
           .then(response => {
-              console.log(response);
-              localStorage.setItem('token',response.data.token)
-              document. location. href="http://localhost:8080/message"; 
-          })
+            console.log(response);
+            localStorage.setItem('token',response.data.token)
+            document.location.href="http://localhost:8080/message"; 
+            })
           .catch(error => console.log(error));
-      } 
+        } 
     }
   }
 };
