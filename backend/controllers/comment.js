@@ -17,11 +17,8 @@ exports.newComment = (req, res, next) => {
     connection.execute(sql, sqlParams, (error, results, fields) => {
         if (error) {
             res.status(500).json({ "error": error.sqlMessage });
-        } else {
-                
+        } else {    
             res.status(201).json({ message: 'Commentaire ajouté' });
-    
-          
         }
     });
     connection.end();

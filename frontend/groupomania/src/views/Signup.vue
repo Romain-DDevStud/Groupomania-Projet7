@@ -132,7 +132,7 @@ small a {
   box-shadow: 1px 1px 1px black;
   margin: 5px;
 }
-.msg{ /*message d'alert qui s'affiche en cas d'erreur de saisie*/
+.msg { /*message d'alert qui s'affiche en cas d'erreur de saisie*/
   color: red;
 }
 </style>

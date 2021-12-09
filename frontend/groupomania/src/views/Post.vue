@@ -4,8 +4,8 @@
             <div id="hautdepage"></div>
             <div class="container1">
                 <img class="logo align-self-end" src='../assets/logo_groupomania.png' alt="Logo Groupomania"/>
-                <div class="BoutonDisconect">
-                    <Disconect/> 
+                <div class="BoutonDisconnect">
+                    <Disconnect/> 
                 </div>
                 <p>
                     <small> Bienvenue {{ member.username }} 😃
@@ -46,9 +46,9 @@
                             <!-- Id du posteur : {{ item.userId }} -->
                             <p v-if="item.attachement">
                                 <img :src="item.attachement" alt="..."/>
-                            </p> <!-- j'affiche l'image uniquement si il y en a une-->
+                            </p> <!-- affichage de l'image uniquement si il y en a une-->
                             <p v-if="member.id==item.userId || member.isAdmin">  
-                                <button @click.prevent="DeleMessage(item.id, item.userId)" id="btn-sup" type="submit" class="btn btn-primary">Supprimer</button>
+                                <button @click.prevent="DeleteMessage(item.id, item.userId)" id="btn-sup" type="submit" class="btn btn-primary">Supprimer</button>
                             </p>    
                             <!--le bouton Supprimer s'affiche uniquement si la personne connectée est la personne qui a publié le message ou un admin-->
                             <!--partie création commentaire -->
@@ -73,3 +73,126 @@
         <Footer/>
     </main>
 </template>
+
+<script>
+import Disconnect from '@/components/Disconnect.vue';
+import Footer from '@/components/Footer.vue';
+import axios from "axios";
+export default {
+    name: "Message",
+    components :{Disconnect, Footer},
+    data() {
+        return {
+            dataMessage: {
+                title: null,
+                content: null,
+                selectedFile: null
+            },
+            dataComment: {
+                content: null
+            },
+            posts: [], // récupération des infos des posts
+            member: [] // récupération des infos du user connecté
+        }
+    },
+    mounted() { 
+        axios // récupération des données du profil connecté
+        .get("http://localhost:3000/api/auth/me", {
+            headers: {
+                Authorization: "Bearer" + localStorage.getItem("token")
+            }
+        })
+        .then(response => {
+            console.log('réponse API', response);
+            this.member = response.data
+        })
+        .catch(error => console.log(error));
+        axios // récupération des messages postés
+        .get("http://localhost:3000/api/post", {
+            headers: {
+                Authorization: "Bearer" + window.localStorage.getItem("token") // récupération de la clé présente dans le LS
+            }
+        })
+        .then(response => {
+            console.log(response);
+            this.posts = response.data
+        })
+        .catch(error => console.log(error));
+    },
+    methods: {
+        SendMessage() { // récupération et envoi des données nécessaires à la création d'un post
+            const formData = new FormData();
+            formData.append('title', this.dataMessage.title); // .append crée une clé de valeur avec les inputs entrés
+            formData.append('content', this.dataMessage.content);
+            formData.append('inputFile', this.dataMessage.selectedFile);
+            if (formData.get("title") !== null && formData.get("content") !== null) { // .get permet de renvoyer la valeur de la clé de .append créée précédemment
+                axios
+                .post("http://localhost:3000/api/post", formData, { // récupération des éléments pour le post
+                    headers: {
+                        Authorization: "Bearer" + window.localStorage.getItem("token")
+                    }
+                })
+                .then(response => {
+                    console.log(response);
+                    document.location.href="http://localhost:8080/post"; // tout est ok refresh de la page et affichage du post
+                })
+                .catch(error => console.log(error));
+            } else {
+                console.log("oops !")
+            }
+        },
+        onFileChanged(event) { // permet de charger un fichier (image) au clic
+            this.dataMessage.selectedFile = event.target.files[0];
+            console.log(this.dataMessage.selectedFile)
+        },
+        DeleteMessage(id, userIdOrder) { // pour supprimer, envoi de l'id du post et du user qui l'a créé
+            if (window.confirm("Souhaitez-vous réellement supprimer ce post?"))
+            axios
+            .delete("http://localhost:3000/api/post/"+id,{data:{userIdOrder},
+                headers: {
+                    Authorization: "Bearer" + window.localStorage.getItem("token")
+                },
+            })
+            .then(() => {
+                window.location.reload();
+            })
+            .catch(error => console.log(error));
+        },
+        createComment(messageId) {
+            if (this.dataComment.comment !== null) {
+                axios
+                .post("http://localhost:3000/api/post/comment", {
+                    content: this.dataComment.content,
+                    messageId: messageId
+                },
+                {
+                    headers: {
+                        Authorization: "Bearer" + window.localStorage.getItem("token")
+                    }
+                })
+                .then(response => {
+                    console.log(response);
+                    document.location.href="http://localhost:8080/post";
+                })
+                .catch(error => console.log(error));
+            }
+        },
+        DeleteComment(id, userIdOrder) {
+            if (window.confirm("Souhaitez-vous réellement supprimer ce commentaire?")) {
+                axios
+                .delete("http://localhost:3000/api/post/comment"+id,{data:{userIdOrder},
+                    headers: {
+                        Authorization: "Bearer" + window.localStorage.getItem("token")
+                    },
+                })
+                .then(() => {
+                    window.location.reload();
+                })
+                .catch(error => console.log(error));
+            }
+        }
+    }
+};
+</script>
+
+

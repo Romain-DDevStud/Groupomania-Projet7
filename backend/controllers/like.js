@@ -27,10 +27,7 @@ exports.rate = (req, res, next) => {
                 if (error) {
                     res.status(500).json({ "error": error.sqlMessage });
                 } else {
-                    
-                    res.status(201).json({ message: 'Like ou dislike pris en compte' });
-                    
-                   
+                    res.status(201).json({ message: 'Like ou dislike pris en compte' });                   
                 }
             });
             connection.end();
