@@ -3,21 +3,25 @@
         <form>
             <div id="hautdepage"></div>
             <div class="container1">
-                <img class="logo align-self-end" src='../assets/logo_groupomania.png' alt="Logo Groupomania"/>
-                <div class="BoutonDisconnect">
-                    <Disconnect/> 
-                </div>
-                <p>
-                    <small> Bienvenue {{ member.username }} 😃
-                        <router-link class="redirection-profil" to="/profil">
-                            <p v-if="member.attachementuser">
-                                <img class="photoprofil" :src="member.attachementuser" alt="..."/>
-                            </p>
-                            <p class="profilsansphoto" v-else>Mon Profil </p>
-                        </router-link>
-                    </small>
-                    <router-link class="redirection-allprofil" to="/allprofil">Membres</router-link>
-                </p>
+                <nav class="navbar">
+                    <img class="logo align-self-end" src="../assets/logo_groupomania2.png" alt="Logo Groupomania"/>
+                    <small> Bienvenue {{ member.username }} 😃 </small>
+                    <ul>
+                        <li>
+                            <router-link class="redirection-profil" to="/profil">Mon profil
+                                <p v-if="member.attachementuser">
+                                    <img class="photoprofil" :src="member.attachementuser" alt="..."/>
+                                </p>
+                            </router-link>
+                        </li>
+                        <li>    
+                            <router-link class="redirection-allprofil" to="/allprofil">Membres</router-link>
+                        </li>    
+                    </ul>
+                    <div class="BoutonDisconnect">
+                        <Disconnect/> 
+                    </div>
+                </nav>
                 <div class="form-group">
                     <label for="inputTitle">Titre</label><br>
                     <input type="text" class="form-control" id="inputTitle" v-model="dataMessage.title"/>
@@ -195,4 +199,183 @@ export default {
 };
 </script>
 
+<style>
+main {
+    width: 100%;
+    background-color: white;
+    margin: 0 auto;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+}
+.container1 {  /*contient les inputs*/
+    background-color:#F2F2F2; /*rgba(255,192,203,0.5);*/
+    font-family: Arial, Helvetica, sans-serif;
+}
+.container1 img { /*logo principal*/
+    width: 250px;
+}
+.container1 .photoprofil { /*photo profil de la page profil perso*/
+    height: 50px;
+    width: 50px;
+    border-radius: 50px;
+}
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+}
+.navbar ul {
+    list-style-type: none;
+    display: flex;
+    padding: 0 20px;
+}
+.navbar ul li>a {
+    padding: 0 10px;
+    color: #2c3e50;
+    text-decoration: none;
+}
+.container2 .photoprofil { /*photo profil de la personne qui poste le message*/
+    height: 65px;
+    width: 65px;
+    border-radius: 50px;
+    margin-top: 8px;
+}
+.cacher { /*je cache le texte du bouton pour WAVE*/
+    display: none;
+}
+span { /*titre, contenu... en gras */
+    font-weight: bold;
+    font-size: 25px;
+}
+.contenu { /*texte des messages*/
+    font-size: 20px;
+}
+.test { /*contient le fil d'actualités et le reste des infos*/
+    display: flex;
+    flex-direction: column;
+    background-color: #FFFAFA;
+    /*background-image: url("../assets/icon.png");*/
+    background-position: center;
+    background-size: 25%;
+}
+/*.profilsansphoto {}*/
+.fa-arrow-circle-up {
+    font-size: 30px;
+}
+.fas-fa-users {
+    size: 40px;
+}
+/*.BoutonDisconect {}*/
+.test li { /*liste contenant les contenus, titre...*/
+    background-color:#F2F2F2;
+    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 2px solid none;
+    border-radius: 8px;
+    box-shadow: 1px 1px 2px #555;
+    list-style: none;
+    font-family: Arial, Helvetica, sans-serif;
+    width: 60%;
+}
+.container3 li {
+    margin-top: 10px;
+    background-color: white;
+}
+.container2 img { /*image publié par les utilisateurs */
+    width: 350px;
+    height: 340px;
+    border: 2px solid none;
+    border-radius: 20px;
+}
+small { /*redirection vers la page profil*/
+    text-align: center;
+    margin: 0 auto;
+}
+/*.redirection-allprofil {}*/
+#inputContent, #inputTitle, textarea {
+    border: 2px solid none;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    box-shadow: 1px 1px 1px black;
+}
+.fa-trash-alt { /*logo corbeille*/
+    font-size: 30px;
+}
+.fa-comment { /*envoie de commentaire*/
+    font-size: 30px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+#btn-sup {
+    margin-bottom: 10px;
+}
+#btn-sup, .btn-publier {
+    padding: 10px;
+    margin-top: 15px;
+    font-size: 1rem;
+    background: linear-gradient(#FD2D01,#ffd7d7);
+    text-decoration: none;
+    color: #2c3e50;
+    border: 0px solid;
+    border-radius: 5px;
+    cursor:pointer;
+    box-shadow: 1px 1px 1px black;
+}
+#btn-sup:hover {
+    scale: 1.1;
+    background: linear-gradient(#FD2D01, #ffd7d7);
+    box-shadow: 1px 1px 1px black;
+    transition-duration: .15s;
+}    
+.btn-publier:hover {
+    scale: 1.1;
+    background: linear-gradient(#FD2D01, #ffd7d7);
+    box-shadow: 1px 1px 1px black;
+    transition-duration: .15s;
+}
 
+@media (max-width: 767px) {
+    .container1 img {
+        width: 250px;
+        height: 50px;
+        position: static;
+    } 
+    .container2 img {
+        width: 150px;
+        height: 140px;
+        border: 2px solid none;
+        border-radius: 20px;
+    }
+    #example-1, #example-2{
+        margin: auto;
+        margin-right: auto;
+        margin-left: auto;
+        padding: 0px;
+    }
+    .test li {
+        width: 100%;
+    }
+    .profilsansphoto {
+        position: static;
+    }
+    .redirection-allprofil {
+        position: static;
+        right: 150px;
+        top: 66px;
+        font-size: 35px;
+    }
+    .BoutonDisconect {
+        position: static;
+    }
+    small {
+        position: static;
+    }
+    Footer {
+        width: 92%;
+    }
+}    
+</style>

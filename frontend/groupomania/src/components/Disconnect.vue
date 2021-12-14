@@ -16,14 +16,15 @@ export default {
 
 <style>
 .btn-disconnect{
-    padding: 5px;
+    padding: 10px;
     font-size: 1rem;
-    background: linear-gradient(#FD2D01, #FFD7D7);
+    background: linear-gradient(#FD2D01,#ffd7d7);
     text-decoration: none;
     color: #2c3e50;
     border: 0px solid;
     border-radius: 5px;
     cursor:pointer;
+    box-shadow: 1px 1px 1px black;
 }
 .btn-disconnect:hover {
     scale: 1.1;

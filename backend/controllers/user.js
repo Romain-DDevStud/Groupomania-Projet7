@@ -8,6 +8,7 @@ const { getCommentsOfEachPosts, getLikesOfEachPosts } = require('./post');
 
 /* Ajout d'un nouvel utilisateur */
 exports.newUser = (req, res, next) => {
+    console.log(req.body);
     bcrypt.hash(req.body.password, 10)
     .then(hash => {
         const connection = database.connect();
@@ -20,9 +21,9 @@ exports.newUser = (req, res, next) => {
         const preliminarySql = "SELECT COUNT(*) AS numberOfUsers FROM Users;";
         connection.query(preliminarySql, (error, result, fields) => {
             if (error) {
-            console.log(error);
-            connection.end();
-            res.status(500).json({ "error": error.sqlMessage });
+                console.log(error);
+                connection.end();
+                res.status(500).json({ "error": error.sqlMessage });
             } else {
                 console.log(result);
                 if (result[0].numberOfUsers === 0) {

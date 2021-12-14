@@ -34,7 +34,7 @@ footer small {
     margin-bottom: 1rem;
     display: block;
 }
-.footer-nav a, .redirection-profil {
+.footer-nav a {
     color: #fd2d01;
     text-decoration: none;
     display: inline-block;

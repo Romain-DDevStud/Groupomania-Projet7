@@ -56,27 +56,32 @@ export default {
   methods: {
     sendSignup() {
       const formData = new FormData();
-      formData.append('username', this.dataSignup.username);
+      formData.append('name', this.dataSignup.username);
       formData.append('email', this.dataSignup.email);
       formData.append('password', this.dataSignup.password);
       formData.append('inputFile', this.dataSignup.selectedFile);
-      if (!formData.get("email") || !formData.get("username") || !formData.get("password")) { 
+      const data = {
+        "name":this.dataSignup.username,
+        "email": this.dataSignup.email,
+        "password": this.dataSignup.password
+      }
+      if (!formData.get("email") || !formData.get("name") || !formData.get("password")) { 
         this.msg ="ERREUR DE SAISIE"
       } else { 
         axios
-          .post("http://localhost:3000/api/user/new", formData)
-          .then(response => {
-            console.log(response); //une fois le compte enregistré on remet les inputs "à 0"
-            //Réinitialisation
-            this.dataSignup.email = null;
-            this.dataSignup.username = null;
-            this.dataSignup.password = null;
-            document. location. href="http://localhost:8080/login";
-          })
-          .catch(error => console.log(error));
+        .post("http://localhost:3000/api/user/signup", data)
+        .then(response => {
+          console.log(response); // une fois le compte enregistré on remet les inputs "à 0"
+          //Réinitialisation
+          this.dataSignup.email = null;
+          this.dataSignup.username = null;
+          this.dataSignup.password = null;
+          //document.location.href="http://localhost:8080/login";
+        })
+        .catch(error => console.log(error));
       }
     },
-    onFileChanged (event) { //me permet de charger un fichier (une image) au click
+    onFileChanged (event) { // permet de charger un fichier (une image) au click
       this.dataSignup.selectedFile = event.target.files[0];
         console.log(this.dataSignup.selectedFile)
     }
