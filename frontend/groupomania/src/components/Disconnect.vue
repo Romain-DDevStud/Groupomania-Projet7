@@ -1,5 +1,5 @@
 <template>
-    <p><button @click.prevent="disconect" type="submit" class="btn-disconnect">Se déconnecter </button></p>
+    <p><button @click.prevent="disconnect" type="submit" class="btn-disconnect">Se déconnecter </button></p>
 </template>
 
 <script>

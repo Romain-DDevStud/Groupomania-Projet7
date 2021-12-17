@@ -125,7 +125,7 @@ small a {
   box-shadow: 1px 1px 1px black;
 }
 .btn-signup:hover {
-  scale: 1.1;
+  transform: scale(1.1);
   background: linear-gradient(#FD2D01, #ffd7d7);
   box-shadow: 1px 1px 1px black;
   transition-duration: .15s;

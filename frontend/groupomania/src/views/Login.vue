@@ -50,7 +50,7 @@ export default {
           this.msg ="ERREUR DE SAISIE"
         } else {
             axios
-            .post("http://localhost:3000/api/auth/login", this.dataLogin)
+            .post("http://localhost:3000/api/user/login", this.dataLogin)
             .then(response => {
                 console.log(response);
                 localStorage.setItem('token', response.data.token)
@@ -107,7 +107,7 @@ small a {
     box-shadow: 1px 1px 1px black;
 }
 .btn-connexion:hover {
-    scale: 1.1;
+    transform: scale(1.1);
     background: linear-gradient(#FD2D01, #ffd7d7);
     box-shadow: 1px 1px 1px black;
     transition-duration: .15s;

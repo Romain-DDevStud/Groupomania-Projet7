@@ -22,13 +22,13 @@
                         <Disconnect/> 
                     </div>
                 </nav>
-                <div class="form-group">
+                <!--<div class="form-group">
                     <label for="inputTitle">Titre</label><br>
                     <input type="text" class="form-control" id="inputTitle" v-model="dataMessage.title"/>
-                </div>
+                </div>-->
                 <div class="form-group">
                     <label for="inputContent">Exprimez-vous</label><br>
-                    <textarea id="inputContent" v-model="dataMessage.content" style="height:100px"></textarea>
+                    <textarea id="inputContent" v-model="dataMessage.content" style="height:75px"></textarea>
                 </div>
                 <label for="inputFile"></label>
                 <div class="btn-upload"> 
@@ -200,6 +200,10 @@ export default {
 </script>
 
 <style>
+body {
+    max-width: 1600px;
+    margin: 0 auto;
+}
 main {
     width: 100%;
     background-color: white;
@@ -296,11 +300,12 @@ small { /*redirection vers la page profil*/
 }
 /*.redirection-allprofil {}*/
 #inputContent, #inputTitle, textarea {
-    border: 2px solid none;
+    border: 2px solid transparent;
     border-radius: 10px;
-    border: none;
     outline: none;
     box-shadow: 1px 1px 1px black;
+    width: 30%;
+    margin: 10px 0;
 }
 .fa-trash-alt { /*logo corbeille*/
     font-size: 30px;
@@ -326,13 +331,13 @@ small { /*redirection vers la page profil*/
     box-shadow: 1px 1px 1px black;
 }
 #btn-sup:hover {
-    scale: 1.1;
+    transform: scale(1.1);
     background: linear-gradient(#FD2D01, #ffd7d7);
     box-shadow: 1px 1px 1px black;
     transition-duration: .15s;
 }    
 .btn-publier:hover {
-    scale: 1.1;
+    transform: scale(1.1);
     background: linear-gradient(#FD2D01, #ffd7d7);
     box-shadow: 1px 1px 1px black;
     transition-duration: .15s;
