@@ -97,7 +97,8 @@ exports.login = (req, res, next) => {
                     userId: results[0].id,
                     name: results[0].name,
                     pictureUrl: results[0].pictureurl,
-                    isAdmin: results[0].isadmin
+                    isAdmin: results[0].isadmin,
+                    token: newToken
                 });
             })
             .catch(error => res.status(500).json({ error }));

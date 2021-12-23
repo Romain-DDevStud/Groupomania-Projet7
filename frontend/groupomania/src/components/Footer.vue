@@ -1,5 +1,5 @@
 <template>
-     <footer>
+  <footer>
     <div class="wrapper">
       <small>&copy; 2021 <strong>Groupomania</strong>, Tous droits réservés</small>
       <nav class="footer-nav">

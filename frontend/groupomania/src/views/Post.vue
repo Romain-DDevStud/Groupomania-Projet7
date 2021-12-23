@@ -5,7 +5,6 @@
             <div class="container1">
                 <nav class="navbar">
                     <img class="logo align-self-end" src="../assets/logo_groupomania2.png" alt="Logo Groupomania"/>
-                    <small> Bienvenue {{ member.username }} 😃 </small>
                     <ul>
                         <li>
                             <router-link class="redirection-profil" to="/profil">Mon profil
@@ -22,6 +21,7 @@
                         <Disconnect/> 
                     </div>
                 </nav>
+                <h1> Bienvenue {{ member.username }} ! </h1>
                 <!--<div class="form-group">
                     <label for="inputTitle">Titre</label><br>
                     <input type="text" class="form-control" id="inputTitle" v-model="dataMessage.title"/>
@@ -38,7 +38,7 @@
             </div>
             <div class="container2">
                 <div class = "test">
-                    <h1>Fil d'actualité</h1>
+                    <h2>Fil d'actualité</h2>
                     <ul id="example-1">
                         <li v-for="item in posts" :key="item.id"> 
                             <span>{{ item.title }}<br></span>
@@ -101,9 +101,9 @@ export default {
     },
     mounted() { 
         axios // récupération des données du profil connecté
-        .get("http://localhost:3000/api/auth/me", {
+        .get("http://localhost:3000/api/user/isauth", {
             headers: {
-                Authorization: "Bearer" + localStorage.getItem("token")
+                Authorization: "Bearer " + localStorage.getItem("token")
             }
         })
         .then(response => {
@@ -114,7 +114,7 @@ export default {
         axios // récupération des messages postés
         .get("http://localhost:3000/api/post", {
             headers: {
-                Authorization: "Bearer" + window.localStorage.getItem("token") // récupération de la clé présente dans le LS
+                Authorization: "Bearer " + window.localStorage.getItem("token") // récupération de la clé présente dans le LS
             }
         })
         .then(response => {
@@ -133,7 +133,7 @@ export default {
                 axios
                 .post("http://localhost:3000/api/post", formData, { // récupération des éléments pour le post
                     headers: {
-                        Authorization: "Bearer" + window.localStorage.getItem("token")
+                        Authorization: "Bearer " + window.localStorage.getItem("token")
                     }
                 })
                 .then(response => {
@@ -154,7 +154,7 @@ export default {
             axios
             .delete("http://localhost:3000/api/post/"+id,{data:{userIdOrder},
                 headers: {
-                    Authorization: "Bearer" + window.localStorage.getItem("token")
+                    Authorization: "Bearer " + window.localStorage.getItem("token")
                 },
             })
             .then(() => {
@@ -171,7 +171,7 @@ export default {
                 },
                 {
                     headers: {
-                        Authorization: "Bearer" + window.localStorage.getItem("token")
+                        Authorization: "Bearer " + window.localStorage.getItem("token")
                     }
                 })
                 .then(response => {
@@ -186,7 +186,7 @@ export default {
                 axios
                 .delete("http://localhost:3000/api/post/comment"+id,{data:{userIdOrder},
                     headers: {
-                        Authorization: "Bearer" + window.localStorage.getItem("token")
+                        Authorization: "Bearer " + window.localStorage.getItem("token")
                     },
                 })
                 .then(() => {
@@ -215,6 +215,8 @@ main {
 .container1 {  /*contient les inputs*/
     background-color:#F2F2F2; /*rgba(255,192,203,0.5);*/
     font-family: Arial, Helvetica, sans-serif;
+    margin-bottom: 10px;
+    padding-bottom: 20px;
 }
 .container1 img { /*logo principal*/
     width: 250px;
@@ -232,6 +234,8 @@ main {
 }
 .navbar ul {
     list-style-type: none;
+    width: 100%;
+    justify-content: flex-end;
     display: flex;
     padding: 0 20px;
 }
@@ -327,7 +331,7 @@ small { /*redirection vers la page profil*/
     color: #2c3e50;
     border: 0px solid;
     border-radius: 5px;
-    cursor:pointer;
+    cursor: pointer;
     box-shadow: 1px 1px 1px black;
 }
 #btn-sup:hover {
@@ -372,9 +376,6 @@ small { /*redirection vers la page profil*/
         right: 150px;
         top: 66px;
         font-size: 35px;
-    }
-    .BoutonDisconect {
-        position: static;
     }
     small {
         position: static;

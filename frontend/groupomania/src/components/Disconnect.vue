@@ -15,7 +15,7 @@ export default {
 </script>
 
 <style>
-.btn-disconnect{
+.btn-disconnect {
     padding: 10px;
     font-size: 1rem;
     background: linear-gradient(#FD2D01,#ffd7d7);
@@ -23,16 +23,13 @@ export default {
     color: #2c3e50;
     border: 0px solid;
     border-radius: 5px;
-    cursor:pointer;
+    cursor: pointer;
     box-shadow: 1px 1px 1px black;
 }
 .btn-disconnect:hover {
-    scale: 1.1;
+    transform: scale(1.1);
     background: linear-gradient(#FD2D01, #ffd7d7);
     box-shadow: 1px 1px 1px black;
     transition-duration: .15s;
-}
-.fa-power-off {
-    font-size: 30px;
 }
 </style>

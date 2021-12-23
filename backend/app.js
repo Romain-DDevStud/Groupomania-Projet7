@@ -11,8 +11,13 @@ const postRoutes = require('./routes/post');
 const commentRoutes = require('./routes/comment');
 const likeRoutes = require('./routes/like');
 
+const cors = require('cors');
+
 // lancement de Express
 const app = express();
+app.use(cors({
+    origin: 'http://localhost:8080'
+}));
 
 // middleware pour gestion erreur de CORS
 app.use((req, res, next) => {
@@ -21,6 +26,7 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
 });
+
 
 app.use(express.json());
 
