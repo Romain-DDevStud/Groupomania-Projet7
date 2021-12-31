@@ -45,10 +45,10 @@ export default {
   data() {
     return {
       dataSignup: { //on initialise les éléments suivants qui sont vides pour le moment et seront "remplis" grâce à v-model
-        username: "",
-        email: "",
-        password: "",
-        selectedFile: ""
+        username: null,
+        email: null,
+        password: null,
+        selectedFile: null
       },
       msg:""
     };
@@ -56,20 +56,15 @@ export default {
   methods: {
     sendSignup() {
       const formData = new FormData();
-      formData.append('name', this.dataSignup.username);
+      formData.append('username', this.dataSignup.username);
       formData.append('email', this.dataSignup.email);
       formData.append('password', this.dataSignup.password);
       formData.append('inputFile', this.dataSignup.selectedFile);
-      const data = {
-        "name":this.dataSignup.username,
-        "email": this.dataSignup.email,
-        "password": this.dataSignup.password
-      }
-      if (!formData.get("email") || !formData.get("name") || !formData.get("password")) { 
+      if (!formData.get("email") || !formData.get("username") || !formData.get("password")) { 
         this.msg ="ERREUR DE SAISIE"
       } else { 
         axios
-        .post("http://localhost:3000/api/user/signup", data)
+        .post("http://localhost:3000/api/user/signup", formData)
         .then(response => {
           console.log(response); // une fois le compte enregistré on remet les inputs "à 0"
           //Réinitialisation

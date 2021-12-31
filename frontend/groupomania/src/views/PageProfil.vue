@@ -4,16 +4,16 @@
         <div class="container1">
             <nav class="navbar">
                 <router-link class="redirection-message" to="/post"><Logo/></router-link>
-                <div class="BoutonDisconnect"> <Disconnect/> </div>
+                <div class="BoutonDisconnect"><Disconnect/></div>
             </nav>
             <h1>Votre profil utilisateur :</h1>
             <span> Pseudo :</span> {{ posts.username }}<br>
             <span> Email :</span> {{ posts.email }}<br>
             <span> Numéro d'identifiant :</span> {{ posts.id }} <br>
-            <p v-if="posts.attachementuser"> <img class="photoprofil" :src="posts.attachementuser" alt="..."  /></p><br>
-            <p v-if="posts.isAdmin==true" ><span> Profil administrateur :</span> {{ posts.isAdmin }} <br></p>
+            <p v-if="posts.attachementuser"><img class="photoprofil" :src="posts.attachementuser" alt="..."/></p><br>
+            <p v-if="posts.isAdmin==true"><span> Profil administrateur :</span> {{ posts.isAdmin }} <br></p>
             <!-- le profil administrateur ne s'affiche que si la personne connectée est admin -->
-            <p>  <button @click.prevent="SupProfile" type="submit" class="btn-supcompte">Supprimer le compte</button> </p>
+            <p><button @click.prevent="SupProfile" type="submit" class="btn-supcompte">Supprimer le compte</button></p>
         </div>
         <Footer/>    
     </main>
@@ -34,7 +34,7 @@ export default {
     },
     mounted() { // je récupère les données du profil connecté
         axios
-        .get("http://localhost:3000/api/auth/me", {
+        .get("http://localhost:3000/api/user/isauth", {
             headers: {
                 Authorization: "Bearer " + localStorage.getItem("token")
             }

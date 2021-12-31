@@ -1,60 +1,47 @@
-require('dotenv').config();
-const Cookies = require('cookies');
-const cryptojs = require('crypto-js');
-const database = require('../utils/database');
+const db = require('../models');
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 /* Ajout d'un nouveau commentaire */
-exports.newComment = (req, res, next) => {
-    const connection = database.connect(); 
-    const cryptedCookie = new Cookies(req, res).get('snToken');
-    const userId = JSON.parse(cryptojs.AES.decrypt(cryptedCookie, process.env.COOKIE_KEY).toString(cryptojs.enc.Utf8)).userId;
-    const postId = req.body.postId;
-    const content = req.body.content;
-    const sql = "INSERT INTO Comments (user_id, post_id, content)\
-                VALUES (?, ?, ?);";
-    const sqlParams = [userId, postId, content];
-    console.log('sqlparam',sqlParams) ;
-    connection.execute(sql, sqlParams, (error, results, fields) => {
-        if (error) {
-            res.status(500).json({ "error": error.sqlMessage });
-        } else {    
-            res.status(201).json({ message: 'Commentaire ajouté' });
-        }
-    });
-    connection.end();
-}
+exports.createComment = (req, res, next) => {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+    const userId = decodedToken.userId;
 
-/* Récupération des commentaires d'un post en particulier */
-exports.getCommentsofPost = (req, res, next) => {
-    const connection = database.connect();
-    const postId = req.body.postId;
-    const sql = "SELECT Comments.id AS commentId,Comments.post_id AS postId, Comments.publication_date AS commentDate, Comments.content As commentContent, Users.id AS userId, Users.name AS userName, Users.pictureurl AS userPicture\
-                FROM Comments\
-                INNER JOIN Users ON Comments.user_id = Users.id\
-                WHERE Comments.post_id = ?";
-    const sqlParams = [postId];  
-    connection.execute(sql, sqlParams, (error, comments, fields) => {
-        if (error) {
-            res.status(500).json({ "error": error.sqlMessage });
-        } else {
-            res.status(200).json({ comments });
-        }
-    });
-    connection.end();
+    db.Post.findOne({ where: { uuid: req.body.postId } })
+        .then(post => {
+            if (!post) {
+                return res.status(404).json({ error: 'Post introuvable !' })
+            }
+            db.Comment.create({
+                content: req.body.content,
+                image: ( req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null ),
+                postId: req.body.postId,
+                ownerId: userId
+            })
+            .then(comment => res.status(201).json({ comment }))
+            .catch(error => res.status(400).json({ error }))
+        })
+        .catch(error => res.status(400).json({ message: "erreur" }))
 }
 
 /* Suppression d'un commentaire */
 exports.deleteComment = (req, res, next) => {
-    const connection = database.connect();
-    const commentId = parseInt(req.params.id, 10);
-    const sql = "DELETE FROM Comments WHERE id=?;";
-    const sqlParams = [commentId];
-    connection.execute(sql, sqlParams, (error, results, fields) => {
-        if (error) {
-            res.status(500).json({ "error": error.sqlMessage });
-        } else {
-            res.status(201).json({ message: 'Commentaire supprimé' });
+    db.Comment.findOne({ where: { uuid: req.params.id } })
+    .then(comment => {
+        if(comment.image) {
+            console.log(comment.image)
+            const filename = comment.image.split('/images/')[1]; // on récupère le nom du fichier à supprimer
+            console.log(filename)
+            fs.unlink(`images/${filename}`, () => { // on utilise la fonction unlink du package fs pour supprimer le fichier 
+                comment.destroy({ where: { uuid: req.params.id } })
+                .then(() => res.status(200).json({ message: 'Commentaire supprimé'}))
+                .catch(error => res.status(400).json({ error: 'Problème lors de la suppression du commentaire' }));
+            });
         }
-    });
-    connection.end();
+        comment.destroy({ where: { uuid: req.params.id } })
+        .then(() => res.status(200).json({ message: 'Commentaire supprimé'}))
+        .catch(error => res.status(400).json({ error: 'Problème lors de la suppression du commentaire' }));
+    })
+    .catch(error => res.status(500).json({ error: "Problème lié à la base de données" }));
 }

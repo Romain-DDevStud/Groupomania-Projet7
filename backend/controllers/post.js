@@ -1,177 +1,82 @@
-require('dotenv').config();
-const Cookies = require('cookies');
-const cryptojs = require('crypto-js');
-const database = require('../utils/database');
+const db = require('../models');
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 /* Ajout d'une nouvelle publication */
-exports.newPost = (req, res, next) => {
-    const connection = database.connect();
-    const cryptedCookie = new Cookies(req, res).get('snToken');
-    const userId = JSON.parse(cryptojs.AES.decrypt(cryptedCookie, process.env.COOKIE_KEY).toString(cryptojs.enc.Utf8)).userId;
-    const imageurl = req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null;
-    const content = req.body.content ? req.body.content : null;
-    const sql = "INSERT INTO Posts (user_id, imageurl, content)\
-    VALUES (?, ?, ?);";
-    const sqlParams = [userId, imageurl, content];
-    connection.execute(sql, sqlParams, (error, results, fields) => {
-        if (error) {
-          res.status(500).json({ "error": error.sqlMessage });
-        } else {
-          res.status(201).json({ message: 'Publication ajoutée' });
-        }
-    });
-    connection.end();
-}
+exports.createPost = (req, res, next) => {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+    const userId = decodedToken.userId;  
+    
+    db.User.findOne({ where: { uuid: userId } }) 
+    .then(user => {
+        console.log(req.body)
+        db.Post.create({
+            UserUuid: userId,
+            content: req.body.content,
+            image: ( req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null )
+        })
+        .then(post => {
+            return res.status(201).json({ post })
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(400).json({ message: 'Erreur création bdd' })
+        })
+    })
+    .catch(error => res.status(500).json({ error:"Problème lié à la base de données" }));  
+};
 
-/* Récupération des posts avec commentaires et like/dislike */
-// Fonction pour récupérer les commentaires des posts
-exports.getCommentsOfEachPosts = (posts, connection) => {
-    return Promise.all(posts.map(post => {
-        const sql = "SELECT Comments.id AS commentId, Comments.publication_date AS commentDate, Comments.content As commentContent, Users.id AS userId, Users.name AS userName, Users.pictureurl AS userPicture\
-                    FROM Comments\
-                    INNER JOIN Users ON Comments.user_id = Users.id\
-                    WHERE Comments.post_id = ?";
-        const sqlParams = [post.postId];
-        return new Promise((resolve, reject) => {
-            connection.execute(sql, sqlParams, (error, comments, fields) => {
-              if (error) {
-                reject(error);
-              } else {
-                resolve({ ...post, comments });
-              }
-            });
-        })
-    }));
-}
-// Fonction pour récupérer les likes/dislikes des posts
-exports.getLikesOfEachPosts = (posts, userId, connection) => {
-    return Promise.all(posts.map(post => {
-        const postId = post.postId;
-        const sql = "SELECT\
-                  (SELECT COUNT(*) FROM Likes WHERE (post_id=? AND rate=1)) AS LikesNumber,\
-                  (SELECT COUNT(*) FROM Likes WHERE (post_id=? AND rate=-1)) AS DislikesNumber,\
-                  (SELECT rate FROM Likes WHERE (post_id=? AND user_id=?)) AS currentUserReaction";
-        const sqlParams = [postId, postId, postId, userId];
-        return new Promise((resolve, reject) => {
-            connection.execute(sql, sqlParams, (error, result, fields) => {
-                if (error) {
-                    reject(error);
-                } else {
-                resolve({ ...post, likes: result[0] });
-                }
-            });
-        })
-    }));
-}
-// Récupération de tous les posts, avec commentaires et like/dislike
+/* Récupération des posts */
 exports.getAllPosts = (req, res, next) => {
-    const connection = database.connect();
-    // 1: récupération de tous les posts
-    const sql = "SELECT Posts.id AS postId, Posts.publication_date AS postDate, Posts.imageurl AS postImage, Posts.content as postContent, Users.id AS userId, Users.name AS userName, Users.pictureurl AS userPicture\
-                FROM Posts\
-                INNER JOIN Users ON Posts.user_id = Users.id\
-                ORDER BY postDate DESC";
-    connection.execute(sql, (error, rawPosts, fields) => {
-        if (error) {
-            connection.end();
-            res.status(500).json({ "error": error.sqlMessage });
-        } else {
-            // 2: Pour chaque post, on va chercher tous les commentaires du post
-            this.getCommentsOfEachPosts(rawPosts, connection)
-            .then(postsWithoutLikes => {
-                // 3: Pour chaque post, on rajoute les likes/dislikes
-                const cryptedCookie = new Cookies(req, res).get('snToken');
-                const userId = JSON.parse(cryptojs.AES.decrypt(cryptedCookie, process.env.COOKIE_KEY).toString(cryptojs.enc.Utf8)).userId;
-                this.getLikesOfEachPosts(postsWithoutLikes, userId, connection)
-                .then(posts => {
-                    res.status(200).json({ posts });
-                })
-                .catch(err => {
-                    res.status(500).json({ "error": "Un problème est survenu" });
-                })
-            })
-            .catch(err => {
-                res.status(500).json({ "error": "Un problème est survenu" });
-            })
-        }
-    });
+    db.Post.findAll({
+        include: {
+            model: db.User,
+            attributes: ["uuid", "username"]
+        },
+        order: [
+            ['createdAt', 'DESC']
+        ],
+    })
+    .then(posts => {
+        res.status(200).json(posts);
+    })
+    .catch(error => res.status(500).json({ error: 'Erreur bdd' }))
 }
 
-/* Récupération de plusieurs posts */ 
-exports.getSomePosts = (req, res, next) => {
-    const connection = database.connect();
-    // 1: récupération des posts recherchés
-    const limit = parseInt(req.params.limit);
-    const offset = parseInt(req.params.offset);
-    const sql = "SELECT Posts.id AS postId, Posts.publication_date AS postDate, Posts.imageurl AS postImage, Posts.content as postContent, Users.id AS userId, Users.name AS userName, Users.pictureurl AS userPicture\
-                FROM Posts\
-                INNER JOIN Users ON Posts.user_id = Users.id\
-                ORDER BY postDate DESC\
-                LIMIT ? OFFSET ?;";
-    const sqlParams = [limit, offset];
-    connection.execute(sql, sqlParams, (error, rawPosts, fields) => {
-        if (error) {
-            connection.end();
-            res.status(500).json({ "error": error.sqlMessage });
-        } else {
-            // 2: Pour chaque post, on va chercher tous les commentaires du post
-            this.getCommentsOfEachPosts(rawPosts, connection)
-            .then(postsWithoutLikes => {
-                // 3: Pour chaque post, on rajoute les likes/dislikes
-                const cryptedCookie = new Cookies(req, res).get('snToken');
-                const userId = JSON.parse(cryptojs.AES.decrypt(cryptedCookie, process.env.COOKIE_KEY).toString(cryptojs.enc.Utf8)).userId;
-                this.getLikesOfEachPosts(postsWithoutLikes, userId, connection)
-                .then(posts => {
-                    res.status(200).json({ posts });
-                })
-            })
-        }
-    });
-}
-
-/* Récupération d'un post */
-exports.getOnePost = (req, res, next) => {
-    const connection = database.connect();
-    // 1: récupération du post recherché
-    const postId = parseInt(req.params.id);
-    const sql = "SELECT Posts.id AS postId, Posts.publication_date AS postDate, Posts.imageurl AS postImage, Posts.content as postContent, Users.id AS userId, Users.name AS userName, Users.pictureurl AS userPicture\
-                FROM Posts\
-                INNER JOIN Users ON Posts.user_id = Users.id\
-                WHERE Posts.id = ?\
-                ORDER BY postDate DESC";
-    const sqlParams = [postId];
-    connection.execute(sql, sqlParams, (error, rawPosts, fields) => {
-        if (error) {
-            connection.end();
-            res.status(500).json({ "error": error.sqlMessage });
-        } else {
-            // 2: on va chercher tous les commentaires du post
-            this.getCommentsOfEachPosts(rawPosts, connection)
-            .then(postsWithoutLikes => {
-                // 3: Pour chaque post, on rajoute les likes/dislikes
-                const cryptedCookie = new Cookies(req, res).get('snToken');
-                const userId = JSON.parse(cryptojs.AES.decrypt(cryptedCookie, process.env.COOKIE_KEY).toString(cryptojs.enc.Utf8)).userId;
-                this.getLikesOfEachPosts(postsWithoutLikes, userId, connection)
-                .then(post => {
-                    res.status(200).json({ post });
-                })
-            })
-        }
-    });
+/* Récupération des commentaires */
+exports.getAllComments = (req, res, next) => {
+    db.Comment.findAll({
+        where: { postId: req.params.id},
+        include: {
+            model: db.User,
+            attributes: ["uuid", "username"]
+        },
+        order: [
+            ['createdAt', 'ASC']
+        ],
+    }) 
+    .then(comments => res.status(200).json(comments))
+    .catch(error => res.status(500).json({ error }))
 }
 
 /* Suppression d'un post */
 exports.deletePost = (req, res, next) => {
-    const connection = database.connect();
-    const postId = parseInt(req.params.id, 10);
-    const sql = "DELETE FROM Posts WHERE id=?;";
-    const sqlParams = [postId];
-    connection.execute(sql, sqlParams, (error, results, fields) => {
-        if (error) {
-            res.status(500).json({ "error": error.sqlMessage });
-        } else {
-            res.status(201).json({ message: 'Publication supprimée' });
+    db.Post.findOne({ where: { uuid: req.params.id } })
+    .then(post => {
+        if(post.image) {
+            console.log(post.image)
+            const filename = post.image.split('/images/')[1]; // on récupère le nom du fichier à supprimer
+            console.log(filename)
+            fs.unlink(`images/${filename}`, () => { // on utilise la fonction unlink du package fs pour supprimer le fichier 
+                post.destroy({ where: { uuid: req.params.id } })
+                .then(() => res.status(200).json({ message: 'Post supprimé'}))
+                .catch(error => res.status(400).json({ error: 'Problème lors de la suppression du post' }));
+            });
         }
-    });
-    connection.end();
-}
+        post.destroy({ where: { uuid: req.params.id } })
+        .then(() => res.status(200).json({ message: 'Post supprimé'}))
+        .catch(error => res.status(400).json({ error: 'Problème lors de la suppression du post' }));
+    })
+    .catch(error => res.status(500).json({ error:"Problème lié à la base de données" }));
+};
