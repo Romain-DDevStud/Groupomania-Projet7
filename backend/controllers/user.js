@@ -1,8 +1,6 @@
 require('dotenv').config();
 const bcrypt = require('bcrypt');
-const cryptojs = require('crypto-js');
 const jwt = require('jsonwebtoken');
-const Cookies = require('cookies');
 const db = require('../models');
 
 /* Avec password-validator, création d'un schéma pour meiller sécurisation du MDP */
@@ -31,7 +29,7 @@ exports.signup = (req, res, next) => {
         }
     })  
     if (!schema.validate(req.body.password)) {
-        //Vérifie si  le schema de mot de passe est pas respecté
+        // Vérifie que le schema de mot de passe est bien respecté
         res.status(401).json({
             error: `Mot de passe invalide, il doit contenir au moins 8 caractères, un chiffre, une majuscule, une minuscule, un symbole et ne pas contenir d'espace !`,
         });
