@@ -53,7 +53,7 @@ export default {
             .post("http://localhost:3000/api/user/login", this.dataLogin)
             .then(response => {
                 console.log(response);
-                console.log('token-----',response);
+                console.log('token',response);
                 localStorage.setItem('token', response.data.token)
                 document.location.href="http://localhost:8080/post"; 
               })

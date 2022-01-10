@@ -9,7 +9,7 @@
             <h1>Votre profil utilisateur :</h1>
             <span> Pseudo :</span> {{ posts.username }}<br>
             <span> Email :</span> {{ posts.email }}<br>
-            <span> Numéro d'identifiant :</span> {{ posts.id }} <br>
+            <!--<span> Numéro d'identifiant :</span> {{ posts.id }} <br>-->
             <p v-if="posts.attachementuser"><img class="photoprofil" :src="posts.attachementuser" alt="..."/></p><br>
             <p v-if="posts.isAdmin==true"><span> Profil administrateur :</span> {{ posts.isAdmin }} <br></p>
             <!-- le profil administrateur ne s'affiche que si la personne connectée est admin -->
@@ -34,7 +34,7 @@ export default {
     },
     mounted() { // je récupère les données du profil connecté
         axios
-        .get("http://localhost:3000/api/user/isauth", {
+        .get("http://localhost:3000/api/user/account", {
             headers: {
                 Authorization: "Bearer " + localStorage.getItem("token")
             }

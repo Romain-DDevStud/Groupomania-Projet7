@@ -66,9 +66,9 @@ exports.login = (req, res, next) => {
             }
             res.status(200).json({
                 role: user.role,
-                userId: user.uuid,
+                userId: user.id,
                 token: jwt.sign(
-                { userId: user.uuid },
+                { userId: user.id },
                 'RANDOM_TOKEN_SECRET',
                 { expiresIn: '24h' }
                 )
@@ -83,29 +83,24 @@ exports.login = (req, res, next) => {
 exports.getCurrentUser = (req, res, next) => {
     const token = req.headers.authorization.split(' ')[1];
     console.log(token);
-
     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
     console.log(decodedToken);
-
     const userId = decodedToken.userId;
-    db.User.findOne({ where: { uuid: userId } })
+    console.log(userId);
+    db.User.findOne({ where: { id: userId }})
     .then(user => {
         res.status(200).json({
-            userId: user.uuid,
+            userId: user.id,
             username: user.username,
             email: user.email,
-            role: user.role
+            isAdmin: user.isAdmin
         });
     })
-    .catch(error => res.status(500).json({ error: 'erreur bdd' }))
+    .catch(error => res.status(500).json({ error: 'erreur bdd-recupUser' }))
 }
 /* Récupération de tous les utilisateurs */
 exports.getAllUsers = (req, res, next) => {
-    db.User.findAll({
-        order: [
-            ['name', 'ASC']
-        ],
-    })
+    db.User.findAll()
     .then(users => res.status(200).json(users))
     .catch(error => res.status(500).json({ error }))
 }
@@ -119,9 +114,9 @@ exports.deleteUser = (req, res, next) => {
     console.log(decodedToken);
 
     const userId = decodedToken.userId; 
-    db.User.findOne({ where: { uuid: userId  } })
+    db.User.findOne({ where: { id: userId  } })
     .then(user => {
-        user.destroy({ where: { id: req.params.uuid } })
+        user.destroy({ where: { id: req.params.id } })
         .then(() => res.status(200).json({ message: 'Compte supprimé'}))
         .catch(error => res.status(400).json({ error: 'Problème lors de la suppression du compte' }));
     })

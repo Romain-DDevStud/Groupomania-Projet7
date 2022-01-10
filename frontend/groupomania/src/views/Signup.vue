@@ -55,16 +55,24 @@ export default {
   },
   methods: {
     sendSignup() {
+      const data = {
+        username :  this.dataSignup.username,
+        email :  this.dataSignup.email,
+        password :  this.dataSignup.password,
+        inputFile: this.dataSignup.selectedFile,
+      }
       const formData = new FormData();
       formData.append('username', this.dataSignup.username);
       formData.append('email', this.dataSignup.email);
       formData.append('password', this.dataSignup.password);
       formData.append('inputFile', this.dataSignup.selectedFile);
+      
       if (!formData.get("email") || !formData.get("username") || !formData.get("password")) { 
         this.msg ="ERREUR DE SAISIE"
       } else { 
+       
         axios
-        .post("http://localhost:3000/api/user/signup", formData)
+        .post("http://localhost:3000/api/user/signup", data)
         .then(response => {
           console.log(response); // une fois le compte enregistré on remet les inputs "à 0"
           //Réinitialisation

@@ -41,11 +41,11 @@
                     <h2>Fil d'actualité</h2>
                     <ul id="example-1">
                         <li v-for="item in posts" :key="item.id"> 
-                            <span>{{ item.title }}<br></span>
+                            <!-- <span>{{ item.title }}<br></span> -->
                             <p v-if="item.User.attachementuser">
                                 <img class="photoprofil" :src="item.User.attachementuser" alt="..."/><br>
                             </p>
-                            <i>Publié par <strong>{{ item.User.username }}</strong> le {{item.createdAt.split('T')[0]}} à {{item.createdAt.slice(11,16)}}<br><br></i>
+                            <i>Publié par <strong>{{ item.User.username }}</strong> le {{item.createdAt.split(' ')[0]}} à {{item.createdAt.slice(11,16)}}<br><br></i>
                             <div class="contenu"> {{ item.content }} <br></div>
                             <!-- Id du posteur : {{ item.userId }} -->
                             <p v-if="item.attachement">
@@ -90,8 +90,9 @@ export default {
             dataMessage: {
                 title: null,
                 content: null,
-                selectedFile: null
+                image: null
             },
+            selectedFile: null,
             dataComment: {
                 content: null
             },
@@ -101,13 +102,13 @@ export default {
     },
     mounted() { 
         axios // récupération des données du profil connecté
-        .get("http://localhost:3000/api/user/isauth", {
+        .get("http://localhost:3000/api/user/account", {
             headers: {
                 Authorization: "Bearer " + localStorage.getItem("token")
             }
         })
         .then(response => {
-            console.log('réponse API', response);
+            //console.log('réponse API', response);
             this.member = response.data
         })
         .catch(error => console.log(error));
@@ -118,18 +119,25 @@ export default {
             }
         })
         .then(response => {
-            console.log(response);
+            //console.log(response);
             this.posts = response.data
         })
         .catch(error => console.log(error));
     },
     methods: {
         SendMessage() { // récupération et envoi des données nécessaires à la création d'un post
+            /*const data = {
+                title :  this.dataMessage.title,
+                content :  this.dataMessage.content,
+                inputFile :  this.dataMessage.inputFile,
+            }
+            console.log(data);*/
             const formData = new FormData();
             formData.append('title', this.dataMessage.title); // .append crée une clé de valeur avec les inputs entrés
             formData.append('content', this.dataMessage.content);
-            formData.append('inputFile', this.dataMessage.selectedFile);
-            if (formData.get("title") !== null && formData.get("content") !== null) { // .get permet de renvoyer la valeur de la clé de .append créée précédemment
+            formData.append('image', this.dataMessage.image, this.selectedFile);
+            formData.append('userId', this.member.id);
+            //if (formData.get("image") !== null && formData.get("content") !== null) { // .get permet de renvoyer la valeur de la clé de .append créée précédemment
                 axios
                 .post("http://localhost:3000/api/post", formData, { // récupération des éléments pour le post
                     headers: {
@@ -141,13 +149,14 @@ export default {
                     document.location.href="http://localhost:8080/post"; // tout est ok refresh de la page et affichage du post
                 })
                 .catch(error => console.log(error));
-            } else {
-                console.log("oops !")
-            }
+            /*} else {
+                console.log("Oops !")
+            }*/
         },
         onFileChanged(event) { // permet de charger un fichier (image) au clic
-            this.dataMessage.selectedFile = event.target.files[0];
-            console.log(this.dataMessage.selectedFile)
+            this.dataMessage.image = event.target.files[0];
+            this.selectedFile = event.target.files[0].name;
+            //console.log(this.dataMessage.selectedFile)
         },
         DeleteMessage(id, userIdOrder) { // pour supprimer, envoi de l'id du post et du user qui l'a créé
             if (window.confirm("Souhaitez-vous réellement supprimer ce post?"))
@@ -162,12 +171,12 @@ export default {
             })
             .catch(error => console.log(error));
         },
-        createComment(messageId) {
+        createComment(postId) {
             if (this.dataComment.comment !== null) {
                 axios
                 .post("http://localhost:3000/api/post/comment", {
                     content: this.dataComment.content,
-                    messageId: messageId
+                    postId: postId
                 },
                 {
                     headers: {
@@ -211,6 +220,9 @@ main {
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 18px;
+}
+h2 {
+    margin: 10px auto;
 }
 .container1 {  /*contient les inputs*/
     background-color:#F2F2F2; /*rgba(255,192,203,0.5);*/
@@ -264,9 +276,6 @@ span { /*titre, contenu... en gras */
     display: flex;
     flex-direction: column;
     background-color: #FFFAFA;
-    /*background-image: url("../assets/icon.png");*/
-    background-position: center;
-    background-size: 25%;
 }
 /*.profilsansphoto {}*/
 .fa-arrow-circle-up {
@@ -278,9 +287,7 @@ span { /*titre, contenu... en gras */
 /*.BoutonDisconect {}*/
 .test li { /*liste contenant les contenus, titre...*/
     background-color:#F2F2F2;
-    margin-bottom: 30px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 10px auto 20px;
     border: 2px solid none;
     border-radius: 8px;
     box-shadow: 1px 1px 2px #555;
