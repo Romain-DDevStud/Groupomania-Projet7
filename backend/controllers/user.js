@@ -100,7 +100,11 @@ exports.getCurrentUser = (req, res, next) => {
 }
 /* Récupération de tous les utilisateurs */
 exports.getAllUsers = (req, res, next) => {
-    db.User.findAll()
+    db.User.findAll({
+        order: [
+            ['name', 'ASC']
+      ],
+    })
     .then(users => res.status(200).json(users))
     .catch(error => res.status(500).json({ error }))
 }

@@ -4,12 +4,17 @@
         <div class="container1">
             <nav class="navbar">
                 <router-link class="redirection-message" to="/post"><Logo/></router-link>
+                <!--<ul>
+                    <li>    
+                        <router-link class="redirection-allprofil" to="/allprofil">Membres</router-link>
+                    </li>    
+                </ul>-->
                 <div class="BoutonDisconnect"><Disconnect/></div>
             </nav>
             <h1>Votre profil utilisateur :</h1>
             <span> Pseudo :</span> {{ posts.username }}<br>
             <span> Email :</span> {{ posts.email }}<br>
-            <!--<span> Numéro d'identifiant :</span> {{ posts.id }} <br>-->
+            <!-- <span> Numéro d'identifiant :</span> {{ posts.userId }} <br> -->
             <p v-if="posts.attachementuser"><img class="photoprofil" :src="posts.attachementuser" alt="..."/></p><br>
             <p v-if="posts.isAdmin==true"><span> Profil administrateur :</span> {{ posts.isAdmin }} <br></p>
             <!-- le profil administrateur ne s'affiche que si la personne connectée est admin -->
@@ -20,7 +25,7 @@
 </template>
 
 <script>
-import Disconnect from '@/components/Disconnect.vue'; // appel de la fonction déconnexion
+import Disconnect from '@/components/Disconnect.vue'; 
 import Footer from '@/components/Footer.vue';
 import Logo from '@/components/Logo.vue';
 import axios from "axios";
@@ -40,7 +45,7 @@ export default {
             }
         })
         .then(response => {
-            console.log('réponse API',response);
+            //console.log('réponse API',response);
             this.posts = response.data  
         })
         .catch(error => console.log(error));
@@ -49,7 +54,7 @@ export default {
         SupProfile() { // permet de supprimer un profil au click
             if (window.confirm("Voulez-vous vraiment supprimer votre compte ?"))
             axios
-            .delete("http://localhost:3000/api/auth/delete", {
+            .delete("http://localhost:3000/api/account/delete", {
                 headers: {
                     Authorization: "Bearer " + localStorage.getItem("token")
                 }

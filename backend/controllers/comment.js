@@ -15,9 +15,9 @@ exports.createComment = (req, res, next) => {
             }
             db.Comment.create({
                 content: req.body.content,
-                attachement: ( req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null ),
+                //attachement: ( req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null ),
                 postId: req.body.postId,
-                ownerId: userId
+                userId: userId
             })
             .then(comment => res.status(201).json({ comment }))
             .catch(error => res.status(400).json({ error }))

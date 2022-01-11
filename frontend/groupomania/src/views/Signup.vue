@@ -86,7 +86,7 @@ export default {
     },
     onFileChanged (event) { // permet de charger un fichier (une image) au click
       this.dataSignup.selectedFile = event.target.files[0];
-        console.log(this.dataSignup.selectedFile)
+      console.log(this.dataSignup.selectedFile)
     }
   }
 };

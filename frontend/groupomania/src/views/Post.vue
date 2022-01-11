@@ -7,7 +7,7 @@
                     <img class="logo align-self-end" src="../assets/logo_groupomania2.png" alt="Logo Groupomania"/>
                     <ul>
                         <li>
-                            <router-link class="redirection-profil" to="/profil">Mon profil
+                            <router-link class="redirection-profil" to="/profil">Profil
                                 <p v-if="member.attachementuser">
                                     <img class="photoprofil" :src="member.attachementuser" alt="..."/>
                                 </p>
@@ -15,7 +15,7 @@
                         </li>
                         <li>    
                             <router-link class="redirection-allprofil" to="/allprofil">Membres</router-link>
-                        </li>    
+                        </li>  
                     </ul>
                     <div class="BoutonDisconnect">
                         <Disconnect/> 
@@ -51,20 +51,24 @@
                             <p v-if="item.attachement">
                                 <img :src="item.attachement" alt="..."/>
                             </p> <!-- affichage de l'image uniquement si il y en a une-->
-                            <p v-if="member.id==item.userId || member.isAdmin">  
-                                <button @click.prevent="DeleteMessage(item.id, item.userId)" id="btn-sup" type="submit" class="btn btn-primary">Supprimer</button>
+                            <p v-if="member.userId==item.userId || member.isAdmin">  
+                                <button @click.prevent="DeleteMessage(item.id, item.userId)" id="btn-sup" type="submit" class="btn btn-primary">Supprimer le post</button>
                             </p>    
                             <!--le bouton Supprimer s'affiche uniquement si la personne connectée est la personne qui a publié le message ou un admin-->
                             <!--partie création commentaire -->
-                            <textarea type="text" id="comment" name="comment" class="form-control"  v-model="dataComment.content" placeholder="Insérez votre commentaire..."></textarea>
-                            <a v-on:click="createComment(item.id)">Commenter</a>
+                            <div class="align-comment">
+                                <textarea type="text" v-bind:id="item.id" name="comment" class="form-control"  v-model="dataComment[item.id]" placeholder="Insérez votre commentaire..."></textarea>
+                                <a v-on:click="createComment(item.id)" class="btn-publier">Commenter</a>
+                            </div>
                             <div class="container3">
+                               <!--comments ------  {{ allComments }}-->
                                 <ul id="example-2"> <!--partie affichage commentaire -->
-                                    <li v-for="comment in item.Comments" :key="comment.id"> 
-                                        <i><strong>{{ comment.User.username }}</strong> le {{comment.createdAt.split('T')[0]}} à {{comment.createdAt.slice(11,16)}}</i><br>
-                                        {{ comment.content }}<br>
-                                        <p v-if="member.id==comment.userId || member.isAdmin">
-                                            <button @click.prevent="DeleteComment(comment.id, comment.userId)" id="btn-sup" type="submit" class="btn btn-primary"></button>
+                                    <!--<li v-for="comment in allComments[item.id]" :key="comment.id">-->
+                                    <li v-for="comment in allComments[item.id]" :key="comment.userId + Math.random()"> 
+                                        <i>Commentaire de <strong>{{ item.User.username }}</strong> le {{comment.createdAt.split(' ')[0]}} à {{comment.createdAt.slice(11,16)}} : </i><br>
+                                        <div class="contenu" >{{ comment.content }}<br></div>
+                                        <p v-if="member.userId==item.userId || member.isAdmin">
+                                            <button @click.prevent="DeleteComment(comment.id, comment.userId)" id="btn-sup" type="submit" class="btn btn-primary">Supprimer le commentaire</button>
                                         </p>
                                     </li><!--le bouton Supprimer s'affiche uniquement si la personne connectée est la personne qui a publié le commentaire ou un admin-->
                                 </ul>
@@ -94,8 +98,8 @@ export default {
             },
             selectedFile: null,
             dataComment: {
-                content: null
             },
+            allComments : {},
             posts: [], // récupération des infos des posts
             member: [] // récupération des infos du user connecté
         }
@@ -110,6 +114,7 @@ export default {
         .then(response => {
             //console.log('réponse API', response);
             this.member = response.data
+            //console.log('this.member',this.member)
         })
         .catch(error => console.log(error));
         axios // récupération des messages postés
@@ -120,18 +125,16 @@ export default {
         })
         .then(response => {
             //console.log(response);
-            this.posts = response.data
+            this.posts = response.data ;
+            this.posts.forEach((post) => {
+                this.getComments(post.id) ;
+            })
         })
         .catch(error => console.log(error));
+
     },
     methods: {
         SendMessage() { // récupération et envoi des données nécessaires à la création d'un post
-            /*const data = {
-                title :  this.dataMessage.title,
-                content :  this.dataMessage.content,
-                inputFile :  this.dataMessage.inputFile,
-            }
-            console.log(data);*/
             const formData = new FormData();
             formData.append('title', this.dataMessage.title); // .append crée une clé de valeur avec les inputs entrés
             formData.append('content', this.dataMessage.content);
@@ -158,10 +161,10 @@ export default {
             this.selectedFile = event.target.files[0].name;
             //console.log(this.dataMessage.selectedFile)
         },
-        DeleteMessage(id, userIdOrder) { // pour supprimer, envoi de l'id du post et du user qui l'a créé
+        DeleteMessage(id, userId) { // pour supprimer, envoi de l'id du post et du user qui l'a créé
             if (window.confirm("Souhaitez-vous réellement supprimer ce post?"))
             axios
-            .delete("http://localhost:3000/api/post/"+id,{data:{userIdOrder},
+            .delete("http://localhost:3000/api/post/"+id,{data:{userId},
                 headers: {
                     Authorization: "Bearer " + window.localStorage.getItem("token")
                 },
@@ -172,10 +175,10 @@ export default {
             .catch(error => console.log(error));
         },
         createComment(postId) {
-            if (this.dataComment.comment !== null) {
+            if (this.dataComment[postId] !== null) {
                 axios
-                .post("http://localhost:3000/api/post/comment", {
-                    content: this.dataComment.content,
+                .post("http://localhost:3000/api/comment", {
+                    content: this.dataComment[postId],
                     postId: postId
                 },
                 {
@@ -186,14 +189,31 @@ export default {
                 .then(response => {
                     console.log(response);
                     document.location.href="http://localhost:8080/post";
+                    this.getComments(postId);
                 })
                 .catch(error => console.log(error));
             }
         },
-        DeleteComment(id, userIdOrder) {
+        getComments(postId) {
+            axios
+            .get(`http://localhost:3000/api/post/${postId}/comments`, 
+            {
+                headers: {
+                    Authorization: "Bearer " + window.localStorage.getItem("token")
+                }
+            })
+            .then(response => {
+                
+                this.allComments[postId]= response.data ;
+                //console.log("this.allComments",this.allComments);
+                //document.location.href="http://localhost:8080/post";
+            })
+            .catch(error => console.log(error));
+        },
+        DeleteComment(userId) {
             if (window.confirm("Souhaitez-vous réellement supprimer ce commentaire?")) {
                 axios
-                .delete("http://localhost:3000/api/post/comment"+id,{data:{userIdOrder},
+                .delete(`http://localhost:3000/api/comment/${userId}`, {
                     headers: {
                         Authorization: "Bearer " + window.localStorage.getItem("token")
                     },
@@ -225,7 +245,7 @@ h2 {
     margin: 10px auto;
 }
 .container1 {  /*contient les inputs*/
-    background-color:#F2F2F2; /*rgba(255,192,203,0.5);*/
+    background-color:#F2F2F2; 
     font-family: Arial, Helvetica, sans-serif;
     margin-bottom: 10px;
     padding-bottom: 20px;
@@ -270,7 +290,7 @@ span { /*titre, contenu... en gras */
     font-size: 25px;
 }
 .contenu { /*texte des messages*/
-    font-size: 20px;
+    font-size: 18px;
 }
 .test { /*contient le fil d'actualités et le reste des infos*/
     display: flex;
@@ -284,7 +304,6 @@ span { /*titre, contenu... en gras */
 .fas-fa-users {
     size: 40px;
 }
-/*.BoutonDisconect {}*/
 .test li { /*liste contenant les contenus, titre...*/
     background-color:#F2F2F2;
     margin: 10px auto 20px;
@@ -295,8 +314,24 @@ span { /*titre, contenu... en gras */
     font-family: Arial, Helvetica, sans-serif;
     width: 60%;
 }
+.test li > p {
+    margin: 5px 0;
+}
+.align-comment {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.align-comment > a {
+    cursor: pointer;
+    margin: 0 10px;
+}
+.container3 {
+    padding-bottom: 5px;
+}
 .container3 li {
-    margin-top: 10px;
+    margin-top: 5px;
     background-color: white;
 }
 .container2 img { /*image publié par les utilisateurs */
@@ -312,7 +347,7 @@ small { /*redirection vers la page profil*/
 /*.redirection-allprofil {}*/
 #inputContent, #inputTitle, textarea {
     border: 2px solid transparent;
-    border-radius: 10px;
+    border-radius: 5px;
     outline: none;
     box-shadow: 1px 1px 1px black;
     width: 30%;
@@ -355,14 +390,23 @@ small { /*redirection vers la page profil*/
 }
 
 @media (max-width: 767px) {
+    main {
+        font-size: 0.8rem;
+    }
+    .navbar {
+        justify-content: center;
+    }
+    .navbar ul li {
+        padding: 0 5px;
+    }
     .container1 img {
-        width: 250px;
-        height: 50px;
+        width: 25vw;
+        height: 10vh;
         position: static;
     } 
     .container2 img {
-        width: 150px;
-        height: 140px;
+        width: 40vw;
+        height: 22vh;
         border: 2px solid none;
         border-radius: 20px;
     }
@@ -375,20 +419,11 @@ small { /*redirection vers la page profil*/
     .test li {
         width: 100%;
     }
-    .profilsansphoto {
-        position: static;
+    #btn-sup, .btn-publier, .btn-disconnect {
+        font-size: 0.8rem;
     }
-    .redirection-allprofil {
-        position: static;
-        right: 150px;
-        top: 66px;
-        font-size: 35px;
-    }
-    small {
-        position: static;
-    }
-    Footer {
-        width: 92%;
+    #inputContent, #inputTitle, textarea {
+        width: 40%;
     }
 }    
 </style>

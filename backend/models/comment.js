@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     const Comment = sequelize.define(
         "Comment",
         {
-            messageId: DataTypes.INTEGER,
+            postId: DataTypes.INTEGER,
             userId: DataTypes.INTEGER,
             content: DataTypes.STRING,
         },
@@ -13,10 +13,10 @@ module.exports = (sequelize, DataTypes) => {
     Comment.associate = function (models) {
         Comment.belongsTo(models.User, {
             foreignKey: "userId",
-        }); //plusieurs messages peuvent-être lié à un user
+        }); 
         Comment.belongsTo(models.Post, {
             //plusieurs commentaires peuvent-être lié à un user
-            foreignKey: "messageId",
+            foreignKey: "postId",
             onDelete: "CASCADE", 
         });
     };
