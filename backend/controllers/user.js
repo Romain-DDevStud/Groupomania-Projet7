@@ -93,7 +93,8 @@ exports.getCurrentUser = (req, res, next) => {
             userId: user.id,
             username: user.username,
             email: user.email,
-            isAdmin: user.isAdmin
+            isAdmin: user.isAdmin,
+            attachementuser: user.attachementuser
         });
     })
     .catch(error => res.status(500).json({ error: 'erreur bdd-recupUser' }))
@@ -101,9 +102,15 @@ exports.getCurrentUser = (req, res, next) => {
 /* Récupération de tous les utilisateurs */
 exports.getAllUsers = (req, res, next) => {
     db.User.findAll({
+        include: {
+            model: db.Post,
+            attribute: [
+                "username"
+            ]
+        },
         order: [
-            ['name', 'ASC']
-      ],
+            ['createdAt', 'ASC']
+        ],
     })
     .then(users => res.status(200).json(users))
     .catch(error => res.status(500).json({ error }))

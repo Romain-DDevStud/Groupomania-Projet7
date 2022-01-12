@@ -94,6 +94,13 @@ span {
     align-items: center;
     background-color: white;
 }
+.navbar ul {
+    list-style-type: none;
+    width: 100%;
+    justify-content: flex-end;
+    display: flex;
+    padding: 0 20px;
+}
 .container1 {  /*contient les inputs*/
     background-color:#F2F2F2; /*rgba(255,192,203,0.5);*/
     font-family: Arial, Helvetica, sans-serif;
@@ -122,8 +129,40 @@ span {
 }
 
 @media (max-width: 767px) {
-    .redirection-message{
+    main {
+        font-size: 0.8rem;
+    }
+    .navbar {
+        justify-content: space-between;
+    }
+    .navbar ul li {
+        padding: 0 5px;
+    }
+    .container1 img {
+        width: 25vw;
+        height: 10vh;
         position: static;
+    } 
+    .container2 img {
+        width: 40vw;
+        height: 22vh;
+        border: 2px solid none;
+        border-radius: 20px;
+    }
+    #example-1, #example-2{
+        margin: auto;
+        margin-right: auto;
+        margin-left: auto;
+        padding: 0px;
+    }
+    .test li {
+        width: 95%;
+    }
+    #btn-sup, .btn-publier, .btn-disconnect {
+        font-size: 0.8rem;
+    }
+    #inputContent, #inputTitle, textarea {
+        width: 40%;
     }
 }
 </style>

@@ -32,7 +32,7 @@ exports.getAllPosts = (req, res, next) => {
         include: {
             model: db.User,
             attribute: [
-                "id", "username"
+                "id", "username", "isAdmin"
             ]
         },
         order: [
@@ -51,7 +51,7 @@ exports.getAllComments = (req, res, next) => {
     db.Comment.findAll({
         where: { postId: req.params.id},
         order: [
-            ['createdAt', 'DESC']
+            ['createdAt', 'ASC']
         ],
     }) 
     .then(comments => res.status(200).json(comments))

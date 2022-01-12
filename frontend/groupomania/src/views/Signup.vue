@@ -59,7 +59,7 @@ export default {
         username :  this.dataSignup.username,
         email :  this.dataSignup.email,
         password :  this.dataSignup.password,
-        inputFile: this.dataSignup.selectedFile,
+        attachementuser: this.dataSignup.attachementuser,
       }
       const formData = new FormData();
       formData.append('username', this.dataSignup.username);

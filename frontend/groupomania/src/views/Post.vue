@@ -61,10 +61,9 @@
                                 <a v-on:click="createComment(item.id)" class="btn-publier">Commenter</a>
                             </div>
                             <div class="container3">
-                               <!--comments ------  {{ allComments }}-->
+                               <!-- comments ------  {{ allComments }} --- -->
                                 <ul id="example-2"> <!--partie affichage commentaire -->
-                                    <!--<li v-for="comment in allComments[item.id]" :key="comment.id">-->
-                                    <li v-for="comment in allComments[item.id]" :key="comment.userId + Math.random()"> 
+                                    <li v-for="comment in allComments[item.id]" :key="comment.id + Math.random()"> 
                                         <i>Commentaire de <strong>{{ item.User.username }}</strong> le {{comment.createdAt.split(' ')[0]}} à {{comment.createdAt.slice(11,16)}} : </i><br>
                                         <div class="contenu" >{{ comment.content }}<br></div>
                                         <p v-if="member.userId==item.userId || member.isAdmin">
@@ -127,7 +126,7 @@ export default {
             //console.log(response);
             this.posts = response.data ;
             this.posts.forEach((post) => {
-                this.getComments(post.id) ;
+                this.getComments(post.id);
             })
         })
         .catch(error => console.log(error));
