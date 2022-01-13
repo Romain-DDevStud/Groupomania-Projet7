@@ -47,9 +47,14 @@ exports.getAllPosts = (req, res, next) => {
 
 /* Récupération des commentaires */
 exports.getAllComments = (req, res, next) => {
-    //console.log('iddddddd',req.params)
     db.Comment.findAll({
         where: { postId: req.params.id},
+        include: {
+            model: db.User,
+            attribute: [
+                "id", "username", "isAdmin"
+            ]
+        },
         order: [
             ['createdAt', 'ASC']
         ],

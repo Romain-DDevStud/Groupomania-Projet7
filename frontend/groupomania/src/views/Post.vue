@@ -34,7 +34,7 @@
                 <div class="btn-upload"> 
                     <input name="inputFile" type="file" class="upload" id="inputFile" @change="onFileChanged"/>
                 </div>
-                <button @click.prevent="SendMessage" type="submit" class="btn-publier">Publier</button>
+                <button @click.prevent="SendMessage" type="submit" id="btn-publier">Publier</button>
             </div>
             <div class="container2">
                 <div class = "test">
@@ -58,19 +58,24 @@
                             <!--partie création commentaire -->
                             <div class="align-comment">
                                 <textarea type="text" v-bind:id="item.id" name="comment" class="form-control"  v-model="dataComment[item.id]" placeholder="Insérez votre commentaire..."></textarea>
-                                <a v-on:click="createComment(item.id)" class="btn-publier">Commenter</a>
+                                <router-link :to="'/Comments/'+item.id">
+                                    <a v-on:click="createComment(item.id)" id="btn-publier">Commenter</a>
+                                </router-link>
                             </div>
                             <div class="container3">
+                                <div>
+                                    <router-link class="comment" :to="'/Comments/' + item.id">Cliquez ici pour voir les commentaires du post</router-link>
+                                </div>
                                <!-- comments ------  {{ allComments }} --- -->
-                                <ul id="example-2"> <!--partie affichage commentaire -->
+                               <!--<ul id="example-2"> 
                                     <li v-for="comment in allComments[item.id]" :key="comment.id + Math.random()"> 
                                         <i>Commentaire de <strong>{{ item.User.username }}</strong> le {{comment.createdAt.split(' ')[0]}} à {{comment.createdAt.slice(11,16)}} : </i><br>
                                         <div class="contenu" >{{ comment.content }}<br></div>
                                         <p v-if="member.userId==item.userId || member.isAdmin">
                                             <button @click.prevent="DeleteComment(comment.id, comment.userId)" id="btn-sup" type="submit" class="btn btn-primary">Supprimer le commentaire</button>
                                         </p>
-                                    </li><!--le bouton Supprimer s'affiche uniquement si la personne connectée est la personne qui a publié le commentaire ou un admin-->
-                                </ul>
+                                    </li>
+                                </ul>-->
                             </div>
                         </li> 
                     </ul> 
@@ -163,7 +168,7 @@ export default {
         DeleteMessage(id, userId) { // pour supprimer, envoi de l'id du post et du user qui l'a créé
             if (window.confirm("Souhaitez-vous réellement supprimer ce post?"))
             axios
-            .delete("http://localhost:3000/api/post/"+id,{data:{userId},
+            .delete("http://localhost:3000/api/post/"+ id, {data:{userId},
                 headers: {
                     Authorization: "Bearer " + window.localStorage.getItem("token")
                 },
@@ -187,7 +192,7 @@ export default {
                 })
                 .then(response => {
                     console.log(response);
-                    document.location.href="http://localhost:8080/post";
+                    //document.location.href="http://localhost:8080/post";
                     this.getComments(postId);
                 })
                 .catch(error => console.log(error));
@@ -243,6 +248,10 @@ main {
 h2 {
     margin: 10px auto;
 }
+a {
+    text-decoration: none;
+    color: #2c3e50;
+}
 .container1 {  /*contient les inputs*/
     background-color:#F2F2F2; 
     font-family: Arial, Helvetica, sans-serif;
@@ -286,7 +295,7 @@ h2 {
 }
 span { /*titre, contenu... en gras */
     font-weight: bold;
-    font-size: 25px;
+    font-size: 18px;
 }
 .contenu { /*texte des messages*/
     font-size: 18px;
@@ -334,10 +343,10 @@ span { /*titre, contenu... en gras */
     background-color: white;
 }
 .container2 img { /*image publié par les utilisateurs */
-    width: 350px;
+    max-width: 100%;
     height: 340px;
     border: 2px solid none;
-    border-radius: 20px;
+    border-radius: 10px;
 }
 small { /*redirection vers la page profil*/
     text-align: center;
@@ -363,7 +372,7 @@ small { /*redirection vers la page profil*/
 #btn-sup {
     margin-bottom: 10px;
 }
-#btn-sup, .btn-publier {
+#btn-sup, #btn-publier {
     padding: 10px;
     margin-top: 15px;
     font-size: 1rem;
@@ -381,7 +390,7 @@ small { /*redirection vers la page profil*/
     box-shadow: 1px 1px 1px black;
     transition-duration: .15s;
 }    
-.btn-publier:hover {
+#btn-publier:hover {
     transform: scale(1.1);
     background: linear-gradient(#FD2D01, #ffd7d7);
     box-shadow: 1px 1px 1px black;
@@ -418,7 +427,7 @@ small { /*redirection vers la page profil*/
     .test li {
         width: 100%;
     }
-    #btn-sup, .btn-publier, .btn-disconnect {
+    #btn-sup, #btn-publier, .btn-disconnect {
         font-size: 0.8rem;
     }
     #inputContent, #inputTitle, textarea {

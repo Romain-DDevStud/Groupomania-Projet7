@@ -12,9 +12,12 @@
                         <span>Pseudo :</span> {{ item.username }}<br>
                         <span>Email :</span> {{ item.email }}<br>
                         <span>Admin :</span> {{ item.isAdmin}}<br>
+                        <p v-if="member.isAdmin===true">
+                            <button @click.prevent="SupProfile()" type="submit" class="btn-supcompte">Supprimer le compte</button>
+                        </p>
                         <p v-if="item.attachementuser" > 
                             <img :src="item.attachementuser" alt="..."  />
-                        </p><br> <!-- j'affiche l'image uniquement si il y en a une  -->
+                        </p><br>
                     </li> 
                 </ul> 
             </div>
@@ -33,7 +36,8 @@ import axios from "axios";
     components :{Disconnect, Footer, Logo},
         data() {
             return{
-                posts: [] 
+                posts: [],
+                member: []
             }    
         },
         mounted() { // je récupère les données du profil connecté
@@ -85,6 +89,26 @@ span {
     font-family: Arial, Helvetica, sans-serif;
     width: 60%;
 }
+.btn-supcompte {
+    padding: 10px;
+    font-size: 1rem;
+    background: linear-gradient(#FD2D01,#ffd7d7);
+    text-decoration: none;
+    color: #2c3e50;
+    border: 0px solid;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 1px 1px 1px black;
+}
+.btn-supcompte:hover {
+    transform: scale(1.1);
+    background: linear-gradient(#FD2D01,#ffd7d7);
+    box-shadow: 1px 1px 1px black;
+    transition-duration: .15s;
+}
+#example-1 li {
+    padding: 5px;
+}
 
 @media (max-width: 767px) {
     main {
@@ -116,7 +140,7 @@ span {
     .test li {
         width: 95%;
     }
-    #btn-sup, .btn-publier, .btn-disconnect {
+    #btn-sup, .btn-publier, .btn-disconnect, .btn-supcompte {
         font-size: 0.8rem;
     }
     #inputContent, #inputTitle, textarea {

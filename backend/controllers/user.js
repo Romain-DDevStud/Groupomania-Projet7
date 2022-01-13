@@ -43,7 +43,8 @@ exports.signup = (req, res, next) => {
         const user = db.User.create({
             username: req.body.username,
             email: req.body.email,
-            password: hash
+            password: hash ,
+            attachementuser: ( req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null )
         })
         .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
         .catch(error => res.status(400).json({ error }));
@@ -120,14 +121,13 @@ exports.getAllUsers = (req, res, next) => {
 exports.deleteUser = (req, res, next) => {
     const token = req.headers.authorization.split(' ')[1];
     console.log(token);
-    
     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
     console.log(decodedToken);
-
-    const userId = decodedToken.userId; 
-    db.User.findOne({ where: { id: userId  } })
+    const userId = decodedToken.userId;
+    console.log(userId);
+    db.User.findOne({ where: { id: req.params.id  }})
     .then(user => {
-        user.destroy({ where: { id: req.params.id } })
+        user.destroy({ where: { id: req.params.id }})
         .then(() => res.status(200).json({ message: 'Compte supprimé'}))
         .catch(error => res.status(400).json({ error: 'Problème lors de la suppression du compte' }));
     })
