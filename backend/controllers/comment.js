@@ -15,7 +15,6 @@ exports.createComment = (req, res, next) => {
             }
             db.Comment.create({
                 content: req.body.content,
-                //attachement: ( req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null ),
                 postId: req.body.postId,
                 userId: userId
             })

@@ -128,9 +128,9 @@ export default {
             const formData = new FormData();
             formData.append('title', this.dataMessage.title); // .append crée une clé de valeur avec les inputs entrés
             formData.append('content', this.dataMessage.content);
-            formData.append('image', this.dataMessage.image, this.selectedFile);
+            formData.append('image', this.dataMessage.image);
             formData.append('userId', this.member.id);
-            //if (formData.get("image") !== null && formData.get("content") !== null) { 
+            if (formData.get("image") !== null && formData.get("content") !== null) { 
                 axios
                 .post("http://localhost:3000/api/post", formData, { // récupération des éléments pour le post
                     headers: {
@@ -142,9 +142,9 @@ export default {
                     document.location.href="http://localhost:8080/post"; // tout est ok refresh de la page et affichage du post
                 })
                 .catch(error => console.log(error));
-            /*} else {
+            } else {
                 console.log("Oops !")
-            }*/
+            }
         },
         onFileChanged(event) { // permet de charger un fichier (image) au clic
             this.dataMessage.image = event.target.files[0];
