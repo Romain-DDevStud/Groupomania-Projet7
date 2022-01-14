@@ -51,7 +51,7 @@ export default {
         SupProfile() { // permet de supprimer un profil au click
             if (window.confirm("Voulez-vous vraiment supprimer votre compte ?"))
             axios
-            .delete("http://localhost:3000/api/user/account/", {
+            .delete("http://localhost:3000/api/user/account", {
                 headers: {
                     Authorization: "Bearer " + localStorage.getItem("token")
                 }

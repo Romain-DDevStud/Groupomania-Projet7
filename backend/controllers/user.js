@@ -120,14 +120,12 @@ exports.getAllUsers = (req, res, next) => {
 /* Supprimer son compte utilisateur */
 exports.deleteUser = (req, res, next) => {
     const token = req.headers.authorization.split(' ')[1];
-    console.log(token);
     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
-    console.log(decodedToken);
     const userId = decodedToken.userId;
-    console.log(userId);
-    db.User.findOne({ where: { id: req.params.id  }})
+    console.log("userId--------------------------------",userId);
+    db.User.findOne({ where: { id: userId  }})
     .then(user => {
-        user.destroy({ where: { id: req.params.id }})
+        user.destroy({ where: { id: userId }})
         .then(() => res.status(200).json({ message: 'Compte supprimé'}))
         .catch(error => res.status(400).json({ error: 'Problème lors de la suppression du compte' }));
     })

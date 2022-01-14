@@ -22,10 +22,6 @@
                     </div>
                 </nav>
                 <h1> Bienvenue {{ member.username }} ! </h1>
-                <!--<div class="form-group">
-                    <label for="inputTitle">Titre</label><br>
-                    <input type="text" class="form-control" id="inputTitle" v-model="dataMessage.title"/>
-                </div>-->
                 <div class="form-group">
                     <label for="inputContent">Exprimez-vous</label><br>
                     <textarea id="inputContent" v-model="dataMessage.content" style="height:75px"></textarea>
@@ -52,7 +48,7 @@
                                 <img :src="item.attachement" alt="..."/>
                             </p> <!-- affichage de l'image uniquement si il y en a une-->
                             <p v-if="member.userId==item.userId || member.isAdmin">  
-                                <button @click.prevent="DeleteMessage(item.id, item.userId)" id="btn-sup" type="submit" class="btn btn-primary">Supprimer le post</button>
+                                <button @click.prevent="DeleteMessage(item.id)" id="btn-sup" type="submit" class="btn btn-primary">Supprimer le post</button>
                             </p>    
                             <!--le bouton Supprimer s'affiche uniquement si la personne connectée est la personne qui a publié le message ou un admin-->
                             <!--partie création commentaire -->
@@ -66,16 +62,6 @@
                                 <div>
                                     <router-link class="comment" :to="'/Comments/' + item.id">Cliquez ici pour voir les commentaires du post</router-link>
                                 </div>
-                               <!-- comments ------  {{ allComments }} --- -->
-                               <!--<ul id="example-2"> 
-                                    <li v-for="comment in allComments[item.id]" :key="comment.id + Math.random()"> 
-                                        <i>Commentaire de <strong>{{ item.User.username }}</strong> le {{comment.createdAt.split(' ')[0]}} à {{comment.createdAt.slice(11,16)}} : </i><br>
-                                        <div class="contenu" >{{ comment.content }}<br></div>
-                                        <p v-if="member.userId==item.userId || member.isAdmin">
-                                            <button @click.prevent="DeleteComment(comment.id, comment.userId)" id="btn-sup" type="submit" class="btn btn-primary">Supprimer le commentaire</button>
-                                        </p>
-                                    </li>
-                                </ul>-->
                             </div>
                         </li> 
                     </ul> 
@@ -144,7 +130,7 @@ export default {
             formData.append('content', this.dataMessage.content);
             formData.append('image', this.dataMessage.image, this.selectedFile);
             formData.append('userId', this.member.id);
-            //if (formData.get("image") !== null && formData.get("content") !== null) { // .get permet de renvoyer la valeur de la clé de .append créée précédemment
+            //if (formData.get("image") !== null && formData.get("content") !== null) { 
                 axios
                 .post("http://localhost:3000/api/post", formData, { // récupération des éléments pour le post
                     headers: {
@@ -165,10 +151,10 @@ export default {
             this.selectedFile = event.target.files[0].name;
             //console.log(this.dataMessage.selectedFile)
         },
-        DeleteMessage(id, userId) { // pour supprimer, envoi de l'id du post et du user qui l'a créé
+        DeleteMessage(id) { // pour supprimer, envoi de l'id du post et du user qui l'a créé
             if (window.confirm("Souhaitez-vous réellement supprimer ce post?"))
             axios
-            .delete("http://localhost:3000/api/post/"+ id, {data:{userId},
+            .delete("http://localhost:3000/api/post/"+ id, {
                 headers: {
                     Authorization: "Bearer " + window.localStorage.getItem("token")
                 },
@@ -207,7 +193,6 @@ export default {
                 }
             })
             .then(response => {
-                
                 this.allComments[postId]= response.data ;
                 //console.log("this.allComments",this.allComments);
                 //document.location.href="http://localhost:8080/post";
@@ -259,7 +244,7 @@ a {
     padding-bottom: 20px;
 }
 .container1 img { /*logo principal*/
-    width: 250px;
+    max-width: 100%;
 }
 .container1 .photoprofil { /*photo profil de la page profil perso*/
     height: 50px;
@@ -271,6 +256,9 @@ a {
     justify-content: space-between;
     align-items: center;
     background-color: white;
+}
+.navbar img {
+    width: 250px;
 }
 .navbar ul {
     list-style-type: none;

@@ -24,10 +24,10 @@
           <label for="inputPassword">Mot de passe </label>
           <input type="password" class="form-control" id="inputPassword" v-model="dataSignup.password"/>
         </div>
-        <div class="btn-upload"> 
+        <!--<div class="btn-upload"> 
             <label for="inputFile">Ajouter une photo de profil</label><br>
             <input name="inputFile" type="file" class="upload" id="inputFile" @change="onFileChanged"/>
-        </div>
+        </div>-->
         <button @click.prevent="sendSignup" type="submit" class="btn-signup">S'enregistrer</button>
       </div>
     </form>
@@ -48,7 +48,7 @@ export default {
         username: null,
         email: null,
         password: null,
-        selectedFile: null
+        attachementuser: null
       },
       msg:""
     };
@@ -65,7 +65,7 @@ export default {
       formData.append('username', this.dataSignup.username);
       formData.append('email', this.dataSignup.email);
       formData.append('password', this.dataSignup.password);
-      formData.append('inputFile', this.dataSignup.selectedFile);
+      //formData.append('attachementuser', this.dataSignup.attachementuser);
       
       if (!formData.get("email") || !formData.get("username") || !formData.get("password")) { 
         this.msg ="ERREUR DE SAISIE"
@@ -79,7 +79,7 @@ export default {
           this.dataSignup.email = null;
           this.dataSignup.username = null;
           this.dataSignup.password = null;
-          //document.location.href="http://localhost:8080/login";
+          document.location.href="http://localhost:8080/login";
         })
         .catch(error => console.log(error));
       }

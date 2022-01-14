@@ -63,23 +63,23 @@ exports.getAllComments = (req, res, next) => {
     .catch(error => res.status(500).json({ error }))
 }
 
-/* Suppression d'un post */
+/* Suppression d'un post - pour supprimer un post il faut d'abord qu'il n'ait plus de commentaires sur ce post */
 exports.deletePost = (req, res, next) => {
     db.Post.findOne({ where: { id: req.params.id } })
     .then(post => {
-        if(post.image) {
-            console.log(post.image)
-            const filename = post.image.split('/images/')[1]; // on récupère le nom du fichier à supprimer
-            console.log(filename)
-            fs.unlink(`images/${filename}`, () => { // on utilise la fonction unlink du package fs pour supprimer le fichier 
+        if(post.dataValues && post.dataValues.attachement) {
+            const filename = post.dataValues.attachement.split('/images/')[1]; // on récupère le nom du fichier à supprimer
+            fs.unlink(`images/${filename}`, () => { // on utilise la fonction unlink du package fs pour supprimer le fichier  
                 post.destroy({ where: { id: req.params.id } })
                 .then(() => res.status(200).json({ message: 'Post supprimé'}))
-                .catch(error => res.status(400).json({ error: 'Problème lors de la suppression du post' }));
+                .catch(error => res.status(400).json({ error: error }));
             });
         }
-        post.destroy({ where: { id: req.params.id } })
-        .then(() => res.status(200).json({ message: 'Post supprimé'}))
-        .catch(error => res.status(400).json({ error: 'Problème lors de la suppression du post' }));
+        else {
+            post.destroy({ where: { id: req.params.id } })
+            .then(() => res.status(200).json({ message: 'Post supprimé'}))
+            .catch(error => res.status(400).json({ error: 'Problème lors de la suppression du post' }));
+        }
     })
     .catch(error => res.status(500).json({ error:"Problème lié à la base de données" }));
 };
